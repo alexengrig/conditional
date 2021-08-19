@@ -86,17 +86,17 @@ public class ConditionalDemo {
         assertTrue(Conditional.of(father)
                 .evaluate(conditionalFather -> conditionalFather
                         .map(Father::getFatherValue)
-                        .get(fatherValue -> fatherValue.startsWith("father")))
+                        .test(fatherValue -> fatherValue.startsWith("father")))
                 .map(Father::getSon)
                 .evaluate(conditionalSon -> conditionalSon
                         .map(Son::getSonValue)
-                        .get(sonValue -> sonValue.startsWith("son")))
+                        .test(sonValue -> sonValue.startsWith("son")))
                 .map(Son::getGrandson)
                 .evaluate(conditionalGrandson -> conditionalGrandson
                         .map(Grandson::getGrandsonValue)
-                        .get(grandsonValue -> grandsonValue.startsWith("grandson")))
+                        .test(grandsonValue -> grandsonValue.startsWith("grandson")))
                 .map(Grandson::getValue)
-                .get(value -> value.startsWith("value")));
+                .test(value -> value.startsWith("value")));
     }
 
     @Test
@@ -161,16 +161,16 @@ public class ConditionalDemo {
         assertFalse(Conditional.of(father)
                 .evaluate(conditionalFather -> conditionalFather
                         .map(Father::getFatherValue)
-                        .get(fatherValue -> fatherValue.startsWith("ignored")))
+                        .test(fatherValue -> fatherValue.startsWith("ignored")))
                 .map(Father::getSon)
                 .evaluate(conditionalSon -> conditionalSon
                         .map(Son::getSonValue)
-                        .get(sonValue -> sonValue.startsWith("ignored")))
+                        .test(sonValue -> sonValue.startsWith("ignored")))
                 .map(Son::getGrandson)
                 .evaluate(conditionalGrandson -> conditionalGrandson
                         .map(Grandson::getGrandsonValue)
-                        .get(grandsonValue -> grandsonValue.startsWith("ignored")))
+                        .test(grandsonValue -> grandsonValue.startsWith("ignored")))
                 .map(Grandson::getValue)
-                .get(value -> value.startsWith("ignored")));
+                .test(value -> value.startsWith("ignored")));
     }
 }
