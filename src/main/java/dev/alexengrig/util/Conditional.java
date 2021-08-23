@@ -109,6 +109,17 @@ public class Conditional<T> {
         }
     }
 
+    public <U> Conditional<U> flatMapOptional(Function<? super T, ? extends Optional<? extends U>> mapper) {
+        Objects.requireNonNull(mapper);
+        if (has()) {
+            @SuppressWarnings("unchecked")
+            Optional<U> other = (Optional<U>) mapper.apply(value);
+            return ofOptional(Objects.requireNonNull(other));
+        } else {
+            return empty();
+        }
+    }
+
     public Conditional<T> or(Supplier<? extends Conditional<? extends T>> supplier) {
         Objects.requireNonNull(supplier);
         if (has()) {
