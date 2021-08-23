@@ -10,6 +10,8 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Like {@code java.lang.Optional<Boolean>}.
  *
@@ -40,7 +42,7 @@ public class Conditional<T> {
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public static <T> Conditional<T> ofOptional(Optional<? extends T> optional) {
-        Objects.requireNonNull(optional);
+        requireNonNull(optional);
         return optional.<Conditional<T>>map(Conditional::of).orElseGet(Conditional::empty);
     }
 
@@ -53,17 +55,17 @@ public class Conditional<T> {
     }
 
     public void ifHas(Predicate<? super T> predicate, Consumer<? super Boolean> action) {
-        Objects.requireNonNull(predicate);
-        Objects.requireNonNull(action);
+        requireNonNull(predicate);
+        requireNonNull(action);
         if (has()) {
             action.accept(predicate.test(value));
         }
     }
 
     public void ifHasOrElse(Predicate<? super T> predicate, Consumer<? super Boolean> action, Runnable emptyAction) {
-        Objects.requireNonNull(predicate);
-        Objects.requireNonNull(action);
-        Objects.requireNonNull(emptyAction);
+        requireNonNull(predicate);
+        requireNonNull(action);
+        requireNonNull(emptyAction);
         if (has()) {
             action.accept(predicate.test(value));
         } else {
@@ -72,7 +74,7 @@ public class Conditional<T> {
     }
 
     public Conditional<T> filter(Predicate<? super T> filter) {
-        Objects.requireNonNull(filter);
+        requireNonNull(filter);
         if (hasNo() || filter.test(value)) {
             return this;
         } else {
@@ -81,7 +83,7 @@ public class Conditional<T> {
     }
 
     public Conditional<T> evaluate(Predicate<Conditional<? extends T>> evaluator) {
-        Objects.requireNonNull(evaluator);
+        requireNonNull(evaluator);
         if (hasNo() || evaluator.test(this)) {
             return this;
         } else {
@@ -90,7 +92,7 @@ public class Conditional<T> {
     }
 
     public <U> Conditional<U> map(Function<? super T, ? extends U> mapper) {
-        Objects.requireNonNull(mapper);
+        requireNonNull(mapper);
         if (has()) {
             return Conditional.of(mapper.apply(value));
         } else {
@@ -99,35 +101,35 @@ public class Conditional<T> {
     }
 
     public <U> Conditional<U> flatMap(Function<? super T, ? extends Conditional<? extends U>> mapper) {
-        Objects.requireNonNull(mapper);
+        requireNonNull(mapper);
         if (has()) {
             @SuppressWarnings("unchecked")
             Conditional<U> other = (Conditional<U>) mapper.apply(value);
-            return Objects.requireNonNull(other);
+            return requireNonNull(other);
         } else {
             return empty();
         }
     }
 
     public <U> Conditional<U> flatMapOptional(Function<? super T, ? extends Optional<? extends U>> mapper) {
-        Objects.requireNonNull(mapper);
+        requireNonNull(mapper);
         if (has()) {
             @SuppressWarnings("unchecked")
             Optional<U> other = (Optional<U>) mapper.apply(value);
-            return ofOptional(Objects.requireNonNull(other));
+            return ofOptional(requireNonNull(other));
         } else {
             return empty();
         }
     }
 
     public Conditional<T> or(Supplier<? extends Conditional<? extends T>> supplier) {
-        Objects.requireNonNull(supplier);
+        requireNonNull(supplier);
         if (has()) {
             return this;
         } else {
             @SuppressWarnings("unchecked")
             Conditional<T> other = (Conditional<T>) supplier.get();
-            return Objects.requireNonNull(other);
+            return requireNonNull(other);
         }
     }
 
@@ -148,7 +150,7 @@ public class Conditional<T> {
     }
 
     public boolean test(Predicate<? super T> predicate) {
-        Objects.requireNonNull(predicate);
+        requireNonNull(predicate);
         if (has()) {
             return predicate.test(value);
         } else {
@@ -157,7 +159,7 @@ public class Conditional<T> {
     }
 
     public boolean orElse(Predicate<? super T> predicate, boolean other) {
-        Objects.requireNonNull(predicate);
+        requireNonNull(predicate);
         if (has()) {
             return predicate.test(value);
         } else {
@@ -166,7 +168,7 @@ public class Conditional<T> {
     }
 
     public boolean orElseTrue(Predicate<? super T> predicate) {
-        Objects.requireNonNull(predicate);
+        requireNonNull(predicate);
         if (has()) {
             return predicate.test(value);
         } else {
@@ -175,7 +177,7 @@ public class Conditional<T> {
     }
 
     public boolean orElseFalse(Predicate<? super T> predicate) {
-        Objects.requireNonNull(predicate);
+        requireNonNull(predicate);
         if (has()) {
             return predicate.test(value);
         } else {
@@ -184,8 +186,8 @@ public class Conditional<T> {
     }
 
     public boolean orElseGet(Predicate<? super T> predicate, BooleanSupplier supplier) {
-        Objects.requireNonNull(predicate);
-        Objects.requireNonNull(supplier);
+        requireNonNull(predicate);
+        requireNonNull(supplier);
         if (has()) {
             return predicate.test(value);
         } else {
@@ -194,18 +196,18 @@ public class Conditional<T> {
     }
 
     public boolean orElseGet(Predicate<? super T> predicate, Supplier<Boolean> supplier) {
-        Objects.requireNonNull(predicate);
-        Objects.requireNonNull(supplier);
+        requireNonNull(predicate);
+        requireNonNull(supplier);
         if (has()) {
             return predicate.test(value);
         } else {
             Boolean other = supplier.get();
-            return Objects.requireNonNull(other);
+            return requireNonNull(other);
         }
     }
 
     public boolean orElseThrow(Predicate<? super T> predicate) {
-        Objects.requireNonNull(predicate);
+        requireNonNull(predicate);
         if (has()) {
             return predicate.test(value);
         } else {
@@ -214,8 +216,8 @@ public class Conditional<T> {
     }
 
     public <X extends Throwable> boolean orElseThrow(Predicate<? super T> predicate, Supplier<? extends X> exceptionSupplier) throws X {
-        Objects.requireNonNull(predicate);
-        Objects.requireNonNull(exceptionSupplier);
+        requireNonNull(predicate);
+        requireNonNull(exceptionSupplier);
         if (has()) {
             return predicate.test(value);
         } else {
