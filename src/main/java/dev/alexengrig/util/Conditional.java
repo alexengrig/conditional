@@ -292,6 +292,20 @@ public class Conditional<T> {
         }
     }
 
+    /**
+     * Indicates whether some other object is "equal to" this {@code Conditional}.
+     * The other object is considered equal if:
+     * <ul>
+     *     <li>it is also an {@code Conditional} and;
+     *     <li>both instances have no value present or;
+     *     <li>the present values are "equal to" each other via {@code equals()}.
+     * </ul>
+     *
+     * @param obj an object to be tested for equality
+     * @return {@code true} if the other object is "equal to" this object otherwise {@code false}
+     * @since 0.1.0
+     */
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -304,11 +318,23 @@ public class Conditional<T> {
         }
     }
 
+    /**
+     * Returns the hash code of the value, if present, otherwise {@code 0} (zero) if no value is present.
+     *
+     * @return hash code value of the present value or {@code 0} if no value is present
+     * @since 0.1.0
+     */
     @Override
     public int hashCode() {
         return Objects.hashCode(value);
     }
 
+    /**
+     * Returns a non-empty string representation of this {@code Conditional}.
+     *
+     * @return the string representation of this instance
+     * @since 0.1.0
+     */
     @Override
     public String toString() {
         return isPresent()
