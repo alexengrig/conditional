@@ -19,19 +19,52 @@ import static java.util.Objects.requireNonNull;
  */
 public class Conditional<T> {
 
+    /**
+     * Common instance for {@code empty()}.
+     *
+     * @since 0.1.0
+     */
     private static final Conditional<?> EMPTY = new Conditional<>(null);
 
+    /**
+     * If non-null, the value for evaluating; if null, indicates no value is present.
+     *
+     * @since 0.1.0
+     */
     private final T value;
 
+    /**
+     * Constructs an instance with the value.
+     *
+     * @param value the value for evaluating
+     * @since 0.1.0
+     */
     private Conditional(T value) {
         this.value = value;
     }
 
+    /**
+     * Returns an empty {@code Conditional} instance.
+     *
+     * @param <T> the type of the non-existent value
+     * @return an empty {@code Conditional}
+     * @since 0.1.0
+     */
     @SuppressWarnings("unchecked")
     public static <T> Conditional<T> empty() {
         return (Conditional<T>) EMPTY;
     }
 
+    /**
+     * Returns a {@code Conditional} with the given value,
+     * if the value is {@code null}, then {@code empty()}.
+     *
+     * @param value the nullable value
+     * @param <T>   the type of the value
+     * @return a {@code Conditional} with {@code value},
+     * if {@code value} is {@code null} then {@code empty()}
+     * @since 0.1.0
+     */
     public static <T> Conditional<T> of(T value) {
         if (value != null) {
             return new Conditional<>(value);
@@ -40,12 +73,34 @@ public class Conditional<T> {
         }
     }
 
+    /**
+     * Returns a {@code Conditional} with a value of the {@code Optional},
+     * if the {@code Optional} is empty, then {@code empty()}.
+     *
+     * @param optional {@code Optional}
+     * @param <T>      the type of the {@code Optional}
+     * @return a {@code Conditional} with a value of {@code optional},
+     * if {@code optional} is empty, then {@code empty()}
+     * @throws NullPointerException if {@code optional} is {@code null}
+     * @since 0.1.0
+     */
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public static <T> Conditional<T> ofOptional(Optional<? extends T> optional) {
         requireNonNull(optional);
         return optional.<Conditional<T>>map(Conditional::of).orElseGet(Conditional::empty);
     }
 
+    /**
+     * If a value is non-{@code null}, passes the value to the given predicate and returns his result,
+     * otherwise throws {@code NoSuchElementException}.
+     *
+     * @param predicate the predicate for evaluating
+     * @return {@code predicate}'s result for the non-{@code null} value
+     * @throws NoSuchElementException if there is no value
+     * @throws NullPointerException   if {@code predicate} is {@code null}
+     * @apiNote The preferred alternative to this method is {@link #orElseThrow(Predicate)}.
+     * @since 0.1.0
+     */
     public boolean test(Predicate<? super T> predicate) {
         requireNonNull(predicate);
         if (isPresent()) {
@@ -55,10 +110,22 @@ public class Conditional<T> {
         }
     }
 
+    /**
+     * If a value is not present, returns {@code true}, otherwise {@code false}.
+     *
+     * @return {@code true} if a value is not present, otherwise {@code false}
+     * @since 0.1.0
+     */
     public boolean isPresent() {
         return value != null;
     }
 
+    /**
+     * If a value is not present, returns {@code true}, otherwise {@code false}.
+     *
+     * @return {@code true} if a value is not present, otherwise {@code false}
+     * @since 0.1.0
+     */
     public boolean isEmpty() {
         return value == null;
     }
