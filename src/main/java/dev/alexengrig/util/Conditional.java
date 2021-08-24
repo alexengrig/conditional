@@ -48,25 +48,25 @@ public class Conditional<T> {
 
     public boolean test(Predicate<? super T> predicate) {
         requireNonNull(predicate);
-        if (has()) {
+        if (isPresent()) {
             return predicate.test(value);
         } else {
             throw new NoSuchElementException("No value");
         }
     }
 
-    public boolean hasNo() {
-        return value == null;
-    }
-
-    public boolean has() {
+    public boolean isPresent() {
         return value != null;
     }
 
-    public void ifHas(Predicate<? super T> predicate, Consumer<? super Boolean> action) {
+    public boolean isEmpty() {
+        return value == null;
+    }
+
+    public void isPresent(Predicate<? super T> predicate, Consumer<? super Boolean> action) {
         requireNonNull(predicate);
         requireNonNull(action);
-        if (has()) {
+        if (isPresent()) {
             action.accept(predicate.test(value));
         }
     }
@@ -75,7 +75,7 @@ public class Conditional<T> {
         requireNonNull(predicate);
         requireNonNull(action);
         requireNonNull(emptyAction);
-        if (has()) {
+        if (isPresent()) {
             action.accept(predicate.test(value));
         } else {
             emptyAction.run();
@@ -84,7 +84,7 @@ public class Conditional<T> {
 
     public Conditional<T> filter(Predicate<? super T> filter) {
         requireNonNull(filter);
-        if (hasNo() || filter.test(value)) {
+        if (isEmpty() || filter.test(value)) {
             return this;
         } else {
             return empty();
@@ -93,7 +93,7 @@ public class Conditional<T> {
 
     public Conditional<T> evaluate(Predicate<Conditional<? extends T>> evaluator) {
         requireNonNull(evaluator);
-        if (hasNo() || evaluator.test(this)) {
+        if (isEmpty() || evaluator.test(this)) {
             return this;
         } else {
             return empty();
@@ -102,7 +102,7 @@ public class Conditional<T> {
 
     public <U> Conditional<U> map(Function<? super T, ? extends U> mapper) {
         requireNonNull(mapper);
-        if (has()) {
+        if (isPresent()) {
             return Conditional.of(mapper.apply(value));
         } else {
             return empty();
@@ -111,7 +111,7 @@ public class Conditional<T> {
 
     public <U> Conditional<U> flatMap(Function<? super T, ? extends Conditional<? extends U>> mapper) {
         requireNonNull(mapper);
-        if (has()) {
+        if (isPresent()) {
             @SuppressWarnings("unchecked")
             Conditional<U> other = (Conditional<U>) mapper.apply(value);
             return requireNonNull(other);
@@ -122,7 +122,7 @@ public class Conditional<T> {
 
     public <U> Conditional<U> flatMapOptional(Function<? super T, ? extends Optional<? extends U>> mapper) {
         requireNonNull(mapper);
-        if (has()) {
+        if (isPresent()) {
             @SuppressWarnings("unchecked")
             Optional<U> other = (Optional<U>) mapper.apply(value);
             return ofOptional(requireNonNull(other));
@@ -133,7 +133,7 @@ public class Conditional<T> {
 
     public Conditional<T> or(Supplier<? extends Conditional<? extends T>> supplier) {
         requireNonNull(supplier);
-        if (has()) {
+        if (isPresent()) {
             return this;
         } else {
             @SuppressWarnings("unchecked")
@@ -143,7 +143,7 @@ public class Conditional<T> {
     }
 
     public Optional<T> optional() {
-        if (has()) {
+        if (isPresent()) {
             return Optional.of(value);
         } else {
             return Optional.empty();
@@ -151,7 +151,7 @@ public class Conditional<T> {
     }
 
     public Stream<T> stream() {
-        if (has()) {
+        if (isPresent()) {
             return Stream.of(value);
         } else {
             return Stream.empty();
@@ -160,7 +160,7 @@ public class Conditional<T> {
 
     public boolean orElse(Predicate<? super T> predicate, boolean other) {
         requireNonNull(predicate);
-        if (has()) {
+        if (isPresent()) {
             return predicate.test(value);
         } else {
             return other;
@@ -169,7 +169,7 @@ public class Conditional<T> {
 
     public boolean orElseTrue(Predicate<? super T> predicate) {
         requireNonNull(predicate);
-        if (has()) {
+        if (isPresent()) {
             return predicate.test(value);
         } else {
             return true;
@@ -178,7 +178,7 @@ public class Conditional<T> {
 
     public boolean orElseFalse(Predicate<? super T> predicate) {
         requireNonNull(predicate);
-        if (has()) {
+        if (isPresent()) {
             return predicate.test(value);
         } else {
             return false;
@@ -188,7 +188,7 @@ public class Conditional<T> {
     public boolean orElseGet(Predicate<? super T> predicate, BooleanSupplier supplier) {
         requireNonNull(predicate);
         requireNonNull(supplier);
-        if (has()) {
+        if (isPresent()) {
             return predicate.test(value);
         } else {
             return supplier.getAsBoolean();
@@ -198,7 +198,7 @@ public class Conditional<T> {
     public boolean orElseGet(Predicate<? super T> predicate, Supplier<Boolean> supplier) {
         requireNonNull(predicate);
         requireNonNull(supplier);
-        if (has()) {
+        if (isPresent()) {
             return predicate.test(value);
         } else {
             Boolean other = supplier.get();
@@ -208,7 +208,7 @@ public class Conditional<T> {
 
     public boolean orElseThrow(Predicate<? super T> predicate) {
         requireNonNull(predicate);
-        if (has()) {
+        if (isPresent()) {
             return predicate.test(value);
         } else {
             throw new NoSuchElementException("No value");
@@ -218,7 +218,7 @@ public class Conditional<T> {
     public <X extends Throwable> boolean orElseThrow(Predicate<? super T> predicate, Supplier<? extends X> exceptionSupplier) throws X {
         requireNonNull(predicate);
         requireNonNull(exceptionSupplier);
-        if (has()) {
+        if (isPresent()) {
             return predicate.test(value);
         } else {
             throw exceptionSupplier.get();
@@ -244,7 +244,7 @@ public class Conditional<T> {
 
     @Override
     public String toString() {
-        return has()
+        return isPresent()
                 ? String.format("Conditional[%s]", value)
                 : "Conditional.empty";
     }

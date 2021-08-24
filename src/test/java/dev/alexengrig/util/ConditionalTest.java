@@ -39,7 +39,7 @@ class ConditionalTest {
         @Test
         @Override
         public void should_check_success_case() {
-            assertTrue(Conditional.empty().hasNo());
+            assertTrue(Conditional.empty().isEmpty());
         }
     }
 
@@ -52,8 +52,8 @@ class ConditionalTest {
         @Test
         @Override
         public void should_check_success_case() {
-            assertTrue(Conditional.of("string").has());
-            assertTrue(Conditional.of(null).hasNo());
+            assertTrue(Conditional.of("string").isPresent());
+            assertTrue(Conditional.of(null).isEmpty());
         }
     }
 
@@ -66,8 +66,8 @@ class ConditionalTest {
         @Test
         @Override
         public void should_check_success_case() {
-            assertTrue(Conditional.ofOptional(Optional.of("string")).has());
-            assertTrue(Conditional.ofOptional(Optional.empty()).hasNo());
+            assertTrue(Conditional.ofOptional(Optional.of("string")).isPresent());
+            assertTrue(Conditional.ofOptional(Optional.empty()).isEmpty());
         }
 
         @Test
@@ -80,10 +80,24 @@ class ConditionalTest {
     }
 
     /**
-     * @see Conditional#hasNo()
+     * @see Conditional#isPresent()
      */
     @Nested
-    class HasNoMethodTest implements MethodTest {
+    class IsPresentMethodTest implements MethodTest {
+
+        @Test
+        @Override
+        public void should_check_success_case() {
+            assertFalse(Conditional.of("string").isEmpty());
+            assertTrue(Conditional.empty().isEmpty());
+        }
+    }
+
+    /**
+     * @see Conditional#isEmpty()
+     */
+    @Nested
+    class IsEmptyMethodTest implements MethodTest {
 
         @Test
         @Override
@@ -93,21 +107,7 @@ class ConditionalTest {
     }
 
     /**
-     * @see Conditional#has()
-     */
-    @Nested
-    class HasMethodTest implements MethodTest {
-
-        @Test
-        @Override
-        public void should_check_success_case() {
-            assertFalse(Conditional.of("string").hasNo());
-            assertTrue(Conditional.empty().hasNo());
-        }
-    }
-
-    /**
-     * @see Conditional#ifHas(java.util.function.Predicate, java.util.function.Consumer)
+     * @see Conditional#isPresent(java.util.function.Predicate, java.util.function.Consumer)
      */
     @Nested
     class IfHasMethodTest implements MethodTest {
@@ -115,17 +115,17 @@ class ConditionalTest {
         @Test
         @Override
         public void should_check_success_case() {
-            Conditional.of("string").ifHas(s -> !s.isEmpty(), Assertions::assertTrue);
-            Conditional.<String>empty().ifHas(s -> !s.isEmpty(), ignore -> fail());
+            Conditional.of("string").isPresent(s -> !s.isEmpty(), Assertions::assertTrue);
+            Conditional.<String>empty().isPresent(s -> !s.isEmpty(), ignore -> fail());
         }
 
         @Test
         @Override
         public void should_check_failure_case() {
             assertThrows(NullPointerException.class, () ->
-                    Conditional.empty().ifHas(null, null));
+                    Conditional.empty().isPresent(null, null));
             assertThrows(NullPointerException.class, () ->
-                    Conditional.empty().ifHas(Objects::isNull, null));
+                    Conditional.empty().isPresent(Objects::isNull, null));
         }
     }
 
@@ -166,9 +166,9 @@ class ConditionalTest {
         @Test
         @Override
         public void should_check_success_case() {
-            assertTrue(Conditional.of("string").filter(string -> string.startsWith("s")).has());
-            assertTrue(Conditional.of("string").filter(string -> string.startsWith("g")).hasNo());
-            assertTrue(Conditional.empty().filter(s -> fail()).hasNo());
+            assertTrue(Conditional.of("string").filter(string -> string.startsWith("s")).isPresent());
+            assertTrue(Conditional.of("string").filter(string -> string.startsWith("g")).isEmpty());
+            assertTrue(Conditional.empty().filter(s -> fail()).isEmpty());
         }
 
         @Test
@@ -188,9 +188,9 @@ class ConditionalTest {
         @Test
         @Override
         public void should_check_success_case() {
-            assertTrue(Conditional.of("string").evaluate(Conditional::hasNo).hasNo());
-            assertTrue(Conditional.of("string").evaluate(Conditional::has).has());
-            assertTrue(Conditional.empty().evaluate(c -> fail()).hasNo());
+            assertTrue(Conditional.of("string").evaluate(Conditional::isEmpty).isEmpty());
+            assertTrue(Conditional.of("string").evaluate(Conditional::isPresent).isPresent());
+            assertTrue(Conditional.empty().evaluate(c -> fail()).isEmpty());
         }
 
         @Test
@@ -211,7 +211,7 @@ class ConditionalTest {
         @Override
         public void should_check_success_case() {
             assertTrue(Conditional.of("string").map(String::length).test(l -> l == 6));
-            assertTrue(Conditional.empty().map(o -> fail()).hasNo());
+            assertTrue(Conditional.empty().map(o -> fail()).isEmpty());
         }
 
         @Test
@@ -232,7 +232,7 @@ class ConditionalTest {
         @Override
         public void should_check_success_case() {
             assertTrue(Conditional.of("string").flatMap(s -> Conditional.of(s.length())).test(l -> l == 6));
-            assertTrue(Conditional.empty().flatMap(o -> fail()).hasNo());
+            assertTrue(Conditional.empty().flatMap(o -> fail()).isEmpty());
         }
 
         @Test
@@ -253,7 +253,7 @@ class ConditionalTest {
         @Override
         public void should_check_success_case() {
             assertTrue(Conditional.of("string").flatMapOptional(s -> Optional.of(s.length())).test(l -> l == 6));
-            assertTrue(Conditional.empty().flatMapOptional(o -> fail()).hasNo());
+            assertTrue(Conditional.empty().flatMapOptional(o -> fail()).isEmpty());
         }
 
         @Test
@@ -274,7 +274,7 @@ class ConditionalTest {
         @Override
         public void should_check_success_case() {
             assertTrue(Conditional.of("string1").or(() -> Conditional.of("string2")).test("string1"::equals));
-            assertTrue(Conditional.<String>empty().or(() -> Conditional.of("string")).has());
+            assertTrue(Conditional.<String>empty().or(() -> Conditional.of("string")).isPresent());
         }
 
         @Test
