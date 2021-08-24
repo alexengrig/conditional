@@ -130,7 +130,7 @@ class ConditionalTest {
     }
 
     /**
-     * @see Conditional#ifHasOrElse(java.util.function.Predicate, java.util.function.Consumer, java.lang.Runnable)
+     * @see Conditional#ifPresentOrElse(java.util.function.Predicate, java.util.function.Consumer, java.lang.Runnable)
      */
     @Nested
     class IfHasOrElseMethodTest implements MethodTest {
@@ -139,20 +139,20 @@ class ConditionalTest {
         @Override
         public void should_check_success_case() {
             AtomicInteger atomicInteger = new AtomicInteger(0);
-            Conditional.empty().ifHasOrElse(Objects::isNull, ignore -> fail(), atomicInteger::incrementAndGet);
+            Conditional.empty().ifPresentOrElse(Objects::isNull, ignore -> fail(), atomicInteger::incrementAndGet);
             assertEquals(1, atomicInteger.get());
-            Conditional.of("string").ifHasOrElse(Objects::nonNull, Assertions::assertTrue, Assertions::fail);
+            Conditional.of("string").ifPresentOrElse(Objects::nonNull, Assertions::assertTrue, Assertions::fail);
         }
 
         @Test
         @Override
         public void should_check_failure_case() {
             assertThrows(NullPointerException.class, () ->
-                    Conditional.empty().ifHasOrElse(null, null, null));
+                    Conditional.empty().ifPresentOrElse(null, null, null));
             assertThrows(NullPointerException.class, () ->
-                    Conditional.empty().ifHasOrElse(Objects::isNull, null, null));
+                    Conditional.empty().ifPresentOrElse(Objects::isNull, null, null));
             assertThrows(NullPointerException.class, () ->
-                    Conditional.empty().ifHasOrElse(Objects::isNull, r -> {
+                    Conditional.empty().ifPresentOrElse(Objects::isNull, r -> {
                     }, null));
         }
     }

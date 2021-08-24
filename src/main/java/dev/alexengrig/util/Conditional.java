@@ -62,7 +62,7 @@ public class Conditional<T> {
      * @param value the nullable value
      * @param <T>   the type of the value
      * @return a {@code Conditional} with {@code value},
-     * if {@code value} is {@code null} then {@code empty()}
+     * if {@code value} is {@code null} then an empty {@code Conditional}
      * @since 0.1.0
      */
     public static <T> Conditional<T> of(T value) {
@@ -80,7 +80,7 @@ public class Conditional<T> {
      * @param optional {@code Optional}
      * @param <T>      the type of the {@code Optional}
      * @return a {@code Conditional} with a value of {@code optional},
-     * if {@code optional} is empty, then {@code empty()}
+     * if {@code optional} is empty, then an empty {@code Conditional}
      * @throws NullPointerException if {@code optional} is {@code null}
      * @since 0.1.0
      */
@@ -130,43 +130,117 @@ public class Conditional<T> {
         return value == null;
     }
 
-    public void isPresent(Predicate<? super T> predicate, Consumer<? super Boolean> action) {
+    /**
+     * If a value is present, invoke the given consumer with a result of the given predicate,
+     * otherwise do nothing.
+     *
+     * @param predicate the predicate for evaluating the value
+     * @param consumer  the consumer to be executed with a result of the predicate if a value is present
+     * @throws NullPointerException if {@code predicate} is null
+     * @throws NullPointerException if {@code consumer} is null
+     * @apiNote This method is like {@code if}:
+     * <pre>{@code
+     *     if (value != null) {
+     *         consumer.accept(predicate.test(value));
+     *     }
+     * }</pre>
+     * @since 0.1.0
+     */
+    public void isPresent(Predicate<? super T> predicate, Consumer<? super Boolean> consumer) {
         requireNonNull(predicate);
-        requireNonNull(action);
+        requireNonNull(consumer);
         if (isPresent()) {
-            action.accept(predicate.test(value));
+            consumer.accept(predicate.test(value));
         }
     }
 
-    public void ifHasOrElse(Predicate<? super T> predicate, Consumer<? super Boolean> action, Runnable emptyAction) {
+    /**
+     * If a value is present, invoke the given consumer with a result of the given predicate,
+     * otherwise invoke the empty action.
+     *
+     * @param predicate   the predicate for evaluating the value
+     * @param consumer    the consumer to be executed with a result of the predicate if the value is present
+     * @param emptyAction the action to be executed if the value is not present
+     * @throws NullPointerException if {@code predicate} is null
+     * @throws NullPointerException if {@code consumer} is null
+     * @throws NullPointerException if {@code emptyAction} is null
+     * @apiNote This method is like {@code if/else}:
+     * <pre>{@code
+     *     if (value != null) {
+     *         consumer.accept(predicate.test(value));
+     *     } else {
+     *         emptyAction.run();
+     *     }
+     * }</pre>
+     * @since 0.1.0
+     */
+    public void ifPresentOrElse(Predicate<? super T> predicate, Consumer<? super Boolean> consumer, Runnable emptyAction) {
         requireNonNull(predicate);
-        requireNonNull(action);
+        requireNonNull(consumer);
         requireNonNull(emptyAction);
         if (isPresent()) {
-            action.accept(predicate.test(value));
+            consumer.accept(predicate.test(value));
         } else {
             emptyAction.run();
         }
     }
 
-    public Conditional<T> filter(Predicate<? super T> filter) {
-        requireNonNull(filter);
-        if (isEmpty() || filter.test(value)) {
+    /**
+     * If a value is present, and the value matches the given predicate,
+     * return an {@code Conditional} with the value,
+     * otherwise return an empty {@code Conditional}.
+     *
+     * @param predicate the predicate to test to the value, if present
+     * @return an {@code Conditional} with the value of this {@code Conditional}
+     * if a value is present and the value matches the given predicate,
+     * otherwise an empty {@code Conditional}
+     * @throws NullPointerException if {@code predicate} is null
+     * @since 0.1.0
+     */
+    public Conditional<T> filter(Predicate<? super T> predicate) {
+        requireNonNull(predicate);
+        if (isEmpty() || predicate.test(value)) {
             return this;
         } else {
             return empty();
         }
     }
 
-    public Conditional<T> evaluate(Predicate<Conditional<? extends T>> evaluator) {
-        requireNonNull(evaluator);
-        if (isEmpty() || evaluator.test(this)) {
+    /**
+     * If a value is present, and this {@code Conditional} matches the given {@code Conditional}-bearing predicate,
+     * return this {@code Conditional},
+     * otherwise return an empty {@code Conditional}.
+     *
+     * @param predicate the predicate to test to this {@code Conditional}, if present
+     * @return this {@code Conditional} if a value is present
+     * and this {@code Conditional} matches the given {@code Conditional}-bearing predicate,
+     * otherwise an empty {@code Conditional}
+     * @throws NullPointerException if {@code predicate} is null
+     * @apiNote This method is like {@code filter(o -> Conditional.of(o).test(predicate))}.
+     * @since 0.1.0
+     */
+    public Conditional<T> evaluate(Predicate<Conditional<? extends T>> predicate) {
+        requireNonNull(predicate);
+        if (isEmpty() || predicate.test(this)) {
             return this;
         } else {
             return empty();
         }
     }
 
+    /**
+     * If a value is present, apply the given mapping function to the value,
+     * and if the result is non-null, return an {@code Conditional} with the result.
+     * Otherwise return an empty {@code Conditional}.
+     *
+     * @param <U>    the type of the result of the mapping function
+     * @param mapper a mapping function to apply to the value, if present
+     * @return an {@code Optional} describing the result of applying a mapping
+     * function to the value of this {@code Optional}, if a value is present,
+     * otherwise an empty {@code Optional}
+     * @throws NullPointerException if {@code mapper} is null
+     * @since 0.1.0
+     */
     public <U> Conditional<U> map(Function<? super T, ? extends U> mapper) {
         requireNonNull(mapper);
         if (isPresent()) {
@@ -176,6 +250,22 @@ public class Conditional<T> {
         }
     }
 
+    /**
+     * If a value is present, apply the provided {@code Conditional}-bearing
+     * mapping function to it, return that result, otherwise return an empty
+     * {@code Conditional}.
+     * This method is similar to {@link #map(Function)},
+     * but the provided mapper is one whose result is already a {@code Conditional},
+     * and if invoked, {@code flatMap} does not wrap it with an additional {@code Conditional}.
+     *
+     * @param <U>    the type parameter to the {@code Conditional} returned by
+     * @param mapper a mapping function to apply to the value, if present the mapping function
+     * @return the result of applying a {@code Conditional}-bearing mapping
+     * function to the value of this {@code Conditional}, if a value is present,
+     * otherwise an empty {@code Conditional}
+     * @throws NullPointerException if {@code mapper} is null or returns a null result
+     * @since 0.1.0
+     */
     public <U> Conditional<U> flatMap(Function<? super T, ? extends Conditional<? extends U>> mapper) {
         requireNonNull(mapper);
         if (isPresent()) {
