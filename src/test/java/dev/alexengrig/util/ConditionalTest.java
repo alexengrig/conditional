@@ -9,11 +9,15 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 class ConditionalTest {
 
@@ -331,7 +335,9 @@ class ConditionalTest {
         @Override
         public void should_check_success_case() {
             assertTrue(Conditional.of("string").test(s -> !s.isEmpty()));
-            assertFalse(Conditional.empty().test(s -> fail()));
+            NoSuchElementException exception = assertThrows(NoSuchElementException.class, () ->
+                    Conditional.empty().test(s -> fail()));
+            assertEquals("No value", exception.getMessage());
         }
 
         @Test
@@ -462,8 +468,9 @@ class ConditionalTest {
         public void should_check_success_case() {
             assertFalse(Conditional.of("string").orElseThrow(String::isEmpty));
             assertFalse(Conditional.of("string").orElseThrow(String::isEmpty, AssertionError::new));
-            assertThrows(NoSuchElementException.class, () ->
+            NoSuchElementException exception = assertThrows(NoSuchElementException.class, () ->
                     Conditional.<String>empty().orElseThrow(String::isEmpty));
+            assertEquals("No value", exception.getMessage());
             assertThrows(AssertionError.class, () ->
                     Conditional.<String>empty().orElseThrow(String::isEmpty, AssertionError::new));
         }

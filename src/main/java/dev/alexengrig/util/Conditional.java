@@ -46,6 +46,15 @@ public class Conditional<T> {
         return optional.<Conditional<T>>map(Conditional::of).orElseGet(Conditional::empty);
     }
 
+    public boolean test(Predicate<? super T> predicate) {
+        requireNonNull(predicate);
+        if (has()) {
+            return predicate.test(value);
+        } else {
+            throw new NoSuchElementException("No value");
+        }
+    }
+
     public boolean hasNo() {
         return value == null;
     }
@@ -149,15 +158,6 @@ public class Conditional<T> {
         }
     }
 
-    public boolean test(Predicate<? super T> predicate) {
-        requireNonNull(predicate);
-        if (has()) {
-            return predicate.test(value);
-        } else {
-            return false;
-        }
-    }
-
     public boolean orElse(Predicate<? super T> predicate, boolean other) {
         requireNonNull(predicate);
         if (has()) {
@@ -211,7 +211,7 @@ public class Conditional<T> {
         if (has()) {
             return predicate.test(value);
         } else {
-            throw new NoSuchElementException("Value is null");
+            throw new NoSuchElementException("No value");
         }
     }
 
