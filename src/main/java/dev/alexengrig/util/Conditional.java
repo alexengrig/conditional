@@ -82,6 +82,8 @@ public class Conditional<T> {
      * @return a {@code Conditional} with a value of {@code optional},
      * if {@code optional} is empty, then an empty {@code Conditional}
      * @throws NullPointerException if {@code optional} is {@code null}
+     * @see Conditional#flatMapOptional(Function)
+     * @see Conditional#optional()
      * @since 0.1.0
      */
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
@@ -136,8 +138,8 @@ public class Conditional<T> {
      *
      * @param predicate the predicate for evaluating the value
      * @param consumer  the consumer to be executed with a result of the predicate if a value is present
-     * @throws NullPointerException if {@code predicate} is null
-     * @throws NullPointerException if {@code consumer} is null
+     * @throws NullPointerException if {@code predicate} is null,
+     *                              if {@code consumer} is null
      * @apiNote This method is like {@code if}:
      * <pre>{@code
      *     if (value != null) {
@@ -161,9 +163,9 @@ public class Conditional<T> {
      * @param predicate   the predicate for evaluating the value
      * @param consumer    the consumer to be executed with a result of the predicate if the value is present
      * @param emptyAction the action to be executed if the value is not present
-     * @throws NullPointerException if {@code predicate} is null
-     * @throws NullPointerException if {@code consumer} is null
-     * @throws NullPointerException if {@code emptyAction} is null
+     * @throws NullPointerException if {@code predicate} is null,
+     *                              if {@code consumer} is null,
+     *                              if {@code emptyAction} is null
      * @apiNote This method is like {@code if/else}:
      * <pre>{@code
      *     if (value != null) {
@@ -252,14 +254,15 @@ public class Conditional<T> {
 
     /**
      * If a value is present, apply the provided {@code Conditional}-bearing
-     * mapping function to it, return that result, otherwise return an empty
-     * {@code Conditional}.
-     * This method is similar to {@link #map(Function)},
+     * mapping function to it, return that result,
+     * otherwise return an empty {@code Conditional}.
+     *
+     * <p>This method is similar to {@link #map(Function)},
      * but the provided mapper is one whose result is already a {@code Conditional},
      * and if invoked, {@code flatMap} does not wrap it with an additional {@code Conditional}.
      *
      * @param <U>    the type parameter to the {@code Conditional} returned by
-     * @param mapper a mapping function to apply to the value, if present the mapping function
+     * @param mapper a mapping function to apply to the value, if present
      * @return the result of applying a {@code Conditional}-bearing mapping
      * function to the value of this {@code Conditional}, if a value is present,
      * otherwise an empty {@code Conditional}
@@ -277,6 +280,21 @@ public class Conditional<T> {
         }
     }
 
+    /**
+     * If a value is present, apply the provided {@code Optional}-bearing
+     * mapping function to it, return a {@code Conditional} with that result,
+     * otherwise return an empty {@code Conditional}.
+     *
+     * @param <U>    the type parameter to the {@code Optional} returned by
+     * @param mapper a mapping function to apply to the value, if present
+     * @return a {@code Conditional} with the result of applying a {@code Optional}-bearing mapping
+     * function to the value of this {@code Conditional}, if a value is present,
+     * otherwise an empty {@code Conditional}
+     * @throws NullPointerException if {@code mapper} is null or returns a null {@code Optional}
+     * @see Conditional#ofOptional(Optional)
+     * @see Conditional#optional()
+     * @since 0.1.0
+     */
     public <U> Conditional<U> flatMapOptional(Function<? super T, ? extends Optional<? extends U>> mapper) {
         requireNonNull(mapper);
         if (isPresent()) {
