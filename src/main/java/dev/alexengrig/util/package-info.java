@@ -1,11 +1,12 @@
 /**
- * This library has the utility class - {@code Conditional},
- * it is like {@code Optional<Boolean>}.
+ * An util library with
+ * {@link dev.alexengrig.util.Conditional} - add-on
+ * of {@link java.util.Optional}&lt;{@link java.lang.Boolean}&gt;.
  *
- * @version 0.1.0
+ * @version 1.0
  * @author Grig Alex
  * @see dev.alexengrig.util.Conditional
  * @see java.util.Optional
- * @since 0.1.0
+ * @since 1.0
  */
 package dev.alexengrig.util;

@@ -13,23 +13,28 @@ import java.util.stream.Stream;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Like {@code java.lang.Optional<Boolean>}.
+ * Like {@link java.util.Optional}&lt;{@link java.lang.Boolean}&gt;,
+ * but more comfortable for {@code boolean} values - conditions.
  *
- * @param <T> the type of value
+ * @param <T> the type of value for evaluating
+ * @author Grig Alex
+ * @version 1.0
+ * @since 1.0
  */
 public class Conditional<T> {
 
     /**
-     * Common instance for {@code empty()}.
+     * Common instance for {@link #empty()}.
      *
-     * @since 0.1.0
+     * @since 1.0
      */
     private static final Conditional<?> EMPTY = new Conditional<>(null);
 
     /**
-     * If non-null, the value for evaluating; if null, indicates no value is present.
+     * If non-{@code null}, the value for evaluating;
+     * if {@code null}, indicates no value is present.
      *
-     * @since 0.1.0
+     * @since 1.0
      */
     private final T value;
 
@@ -37,7 +42,7 @@ public class Conditional<T> {
      * Constructs an instance with the value.
      *
      * @param value the value for evaluating
-     * @since 0.1.0
+     * @since 1.0
      */
     private Conditional(T value) {
         this.value = value;
@@ -48,7 +53,7 @@ public class Conditional<T> {
      *
      * @param <T> the type of the non-existent value
      * @return an empty {@code Conditional}
-     * @since 0.1.0
+     * @since 1.0
      */
     @SuppressWarnings("unchecked")
     public static <T> Conditional<T> empty() {
@@ -57,13 +62,13 @@ public class Conditional<T> {
 
     /**
      * Returns a {@code Conditional} with the given value,
-     * if the value is {@code null}, then {@code empty()}.
+     * if the value is {@code null}, then {@link #empty()}.
      *
-     * @param value the nullable value
+     * @param value the {@code null}able value
      * @param <T>   the type of the value
      * @return a {@code Conditional} with {@code value},
      * if {@code value} is {@code null} then an empty {@code Conditional}
-     * @since 0.1.0
+     * @since 1.0
      */
     public static <T> Conditional<T> of(T value) {
         if (value != null) {
@@ -75,7 +80,7 @@ public class Conditional<T> {
 
     /**
      * Returns a {@code Conditional} with a value of the {@code Optional},
-     * if the {@code Optional} is empty, then {@code empty()}.
+     * if the {@code Optional} is empty, then {@link #empty()}.
      *
      * @param optional {@code Optional}
      * @param <T>      the type of the {@code Optional}
@@ -84,7 +89,7 @@ public class Conditional<T> {
      * @throws NullPointerException if {@code optional} is {@code null}
      * @see Conditional#flatMapOptional(Function)
      * @see Conditional#optional()
-     * @since 0.1.0
+     * @since 1.0
      */
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public static <T> Conditional<T> ofOptional(Optional<? extends T> optional) {
@@ -100,10 +105,11 @@ public class Conditional<T> {
      * @return {@code predicate}'s result for the non-{@code null} value
      * @throws NoSuchElementException if there is no value
      * @throws NullPointerException   if {@code predicate} is {@code null}
-     * @apiNote The preferred alternative to this method is {@link #orElseThrow(Predicate)}.
-     * @since 0.1.0
+     * @see Conditional#orElseTrue(Predicate)
+     * @see Conditional#orElseFalse(Predicate)
+     * @since 1.0
      */
-    public boolean test(Predicate<? super T> predicate) {
+    public boolean test(Predicate<? super T> predicate) throws NoSuchElementException {
         requireNonNull(predicate);
         if (isPresent()) {
             return predicate.test(value);
@@ -113,31 +119,31 @@ public class Conditional<T> {
     }
 
     /**
-     * If a value is not present, returns {@code true}, otherwise {@code false}.
+     * If a value is non-{@code null}, returns {@code true}, otherwise {@code false}.
      *
-     * @return {@code true} if a value is not present, otherwise {@code false}
-     * @since 0.1.0
+     * @return {@code true} if a value is non-{@code null}, otherwise {@code false}
+     * @since 1.0
      */
     public boolean isPresent() {
         return value != null;
     }
 
     /**
-     * If a value is not present, returns {@code true}, otherwise {@code false}.
+     * If a value is {@code null}, returns {@code true}, otherwise {@code false}.
      *
-     * @return {@code true} if a value is not present, otherwise {@code false}
-     * @since 0.1.0
+     * @return {@code true} if a value is {@code null}, otherwise {@code false}
+     * @since 1.0
      */
     public boolean isEmpty() {
         return value == null;
     }
 
     /**
-     * If a value is present, invoke the given consumer with a result of the given predicate,
+     * If a value is non-{@code null}, invoke the given consumer with a result of the given predicate,
      * otherwise do nothing.
      *
      * @param predicate the predicate for evaluating the value
-     * @param consumer  the consumer to be executed with a result of the predicate if a value is present
+     * @param consumer  the consumer to be executed with a result of the predicate if a value is non-{@code null}
      * @throws NullPointerException if {@code predicate} is null,
      *                              if {@code consumer} is null
      * @apiNote This method is like {@code if}:
@@ -146,7 +152,7 @@ public class Conditional<T> {
      *         consumer.accept(predicate.test(value));
      *     }
      * }</pre>
-     * @since 0.1.0
+     * @since 1.0
      */
     public void isPresent(Predicate<? super T> predicate, Consumer<? super Boolean> consumer) {
         requireNonNull(predicate);
@@ -157,12 +163,12 @@ public class Conditional<T> {
     }
 
     /**
-     * If a value is present, invoke the given consumer with a result of the given predicate,
+     * If a value is non-{@code null}, invoke the given consumer with a result of the given predicate,
      * otherwise invoke the empty action.
      *
      * @param predicate   the predicate for evaluating the value
-     * @param consumer    the consumer to be executed with a result of the predicate if the value is present
-     * @param emptyAction the action to be executed if the value is not present
+     * @param consumer    the consumer to be executed with a result of the predicate if the value is non-{@code null}
+     * @param emptyAction the action to be executed if the value is {@code null}
      * @throws NullPointerException if {@code predicate} is null,
      *                              if {@code consumer} is null,
      *                              if {@code emptyAction} is null
@@ -174,9 +180,12 @@ public class Conditional<T> {
      *         emptyAction.run();
      *     }
      * }</pre>
-     * @since 0.1.0
+     * @since 1.0
      */
-    public void ifPresentOrElse(Predicate<? super T> predicate, Consumer<? super Boolean> consumer, Runnable emptyAction) {
+    public void ifPresentOrElse(
+            Predicate<? super T> predicate,
+            Consumer<? super Boolean> consumer, Runnable emptyAction
+    ) {
         requireNonNull(predicate);
         requireNonNull(consumer);
         requireNonNull(emptyAction);
@@ -197,7 +206,7 @@ public class Conditional<T> {
      * if a value is present and the value matches the given predicate,
      * otherwise an empty {@code Conditional}
      * @throws NullPointerException if {@code predicate} is null
-     * @since 0.1.0
+     * @since 1.0
      */
     public Conditional<T> filter(Predicate<? super T> predicate) {
         requireNonNull(predicate);
@@ -219,7 +228,7 @@ public class Conditional<T> {
      * otherwise an empty {@code Conditional}
      * @throws NullPointerException if {@code predicate} is null
      * @apiNote This method is like {@code filter(o -> Conditional.of(o).test(predicate))}.
-     * @since 0.1.0
+     * @since 1.0
      */
     public Conditional<T> evaluate(Predicate<Conditional<? extends T>> predicate) {
         requireNonNull(predicate);
@@ -241,7 +250,7 @@ public class Conditional<T> {
      * function to the value of this {@code Optional}, if a value is present,
      * otherwise an empty {@code Optional}
      * @throws NullPointerException if {@code mapper} is null
-     * @since 0.1.0
+     * @since 1.0
      */
     public <U> Conditional<U> map(Function<? super T, ? extends U> mapper) {
         requireNonNull(mapper);
@@ -267,7 +276,7 @@ public class Conditional<T> {
      * function to the value of this {@code Conditional}, if a value is present,
      * otherwise an empty {@code Conditional}
      * @throws NullPointerException if {@code mapper} is null or returns a null result
-     * @since 0.1.0
+     * @since 1.0
      */
     public <U> Conditional<U> flatMap(Function<? super T, ? extends Conditional<? extends U>> mapper) {
         requireNonNull(mapper);
@@ -293,7 +302,7 @@ public class Conditional<T> {
      * @throws NullPointerException if {@code mapper} is null or returns a null {@code Optional}
      * @see Conditional#ofOptional(Optional)
      * @see Conditional#optional()
-     * @since 0.1.0
+     * @since 1.0
      */
     public <U> Conditional<U> flatMapOptional(Function<? super T, ? extends Optional<? extends U>> mapper) {
         requireNonNull(mapper);
@@ -306,6 +315,18 @@ public class Conditional<T> {
         }
     }
 
+    /**
+     * If a value is present, returns a {@code Conditional} describing the value,
+     * otherwise returns a {@code Conditional} produced by the supplying function.
+     *
+     * @param supplier the supplying function that produces a {@code Conditional} to be returned
+     * @return returns a {@code Conditional} describing the value of this
+     * {@code Conditional}, if a value is present, otherwise a
+     * {@code Conditional} produced by the supplying function.
+     * @throws NullPointerException if the supplying function is {@code null} or
+     *                              produces a {@code null} result
+     * @since 1.0
+     */
     public Conditional<T> or(Supplier<? extends Conditional<? extends T>> supplier) {
         requireNonNull(supplier);
         if (isPresent()) {
@@ -317,6 +338,14 @@ public class Conditional<T> {
         }
     }
 
+    /**
+     * If a value is present, return an {@code Optional} with this value,
+     * otherwise return an empty {@code Optional}.
+     *
+     * @return {@code Optional} with a value or empty
+     * @see Optional
+     * @since 1.0
+     */
     public Optional<T> optional() {
         if (isPresent()) {
             return Optional.of(value);
@@ -325,6 +354,14 @@ public class Conditional<T> {
         }
     }
 
+    /**
+     * If a value is present, return an {@code Stream} with this value,
+     * otherwise return an empty {@code Stream}.
+     *
+     * @return {@code Stream} with a value or empty
+     * @see Stream
+     * @since 1.0
+     */
     public Stream<T> stream() {
         if (isPresent()) {
             return Stream.of(value);
@@ -333,6 +370,15 @@ public class Conditional<T> {
         }
     }
 
+    /**
+     * If a value is present, returns a result of the given predicate,
+     * otherwise returns {@code other}.
+     *
+     * @param predicate the predicate for testing the value
+     * @param other     the value to be returned, if no value is present
+     * @return a result of {@code predicate}, if a value is present, otherwise {@code other}
+     * @since 1.0
+     */
     public boolean orElse(Predicate<? super T> predicate, boolean other) {
         requireNonNull(predicate);
         if (isPresent()) {
@@ -342,6 +388,15 @@ public class Conditional<T> {
         }
     }
 
+    /**
+     * If a value is present, returns a result of the given predicate,
+     * otherwise returns {@code true}.
+     *
+     * @param predicate the predicate for testing the value
+     * @return a result of {@code predicate}, if a value is present, otherwise {@code true}
+     * @throws NullPointerException if {@code predicate} is {@code null}
+     * @since 1.0
+     */
     public boolean orElseTrue(Predicate<? super T> predicate) {
         requireNonNull(predicate);
         if (isPresent()) {
@@ -351,6 +406,15 @@ public class Conditional<T> {
         }
     }
 
+    /**
+     * If a value is present, returns a result of the given predicate,
+     * otherwise returns {@code false}.
+     *
+     * @param predicate the predicate for testing the value
+     * @return a result of {@code predicate}, if a value is present, otherwise {@code false}
+     * @throws NullPointerException if {@code predicate} is {@code null}
+     * @since 1.0
+     */
     public boolean orElseFalse(Predicate<? super T> predicate) {
         requireNonNull(predicate);
         if (isPresent()) {
@@ -360,6 +424,18 @@ public class Conditional<T> {
         }
     }
 
+    /**
+     * If a value is present, returns a result of the given predicate,
+     * otherwise returns a result of the given {@code boolean}-supplier.
+     *
+     * @param predicate the predicate for testing the value
+     * @param supplier  the supplying function that produces a value to be returned,
+     *                  if no value is present
+     * @return a result of {@code predicate}, if a value is present,
+     * otherwise a result of {@code supplier}
+     * @throws NullPointerException if {@code predicate} or {@code supplier} are {@code null}
+     * @since 1.0
+     */
     public boolean orElseGet(Predicate<? super T> predicate, BooleanSupplier supplier) {
         requireNonNull(predicate);
         requireNonNull(supplier);
@@ -370,6 +446,19 @@ public class Conditional<T> {
         }
     }
 
+    /**
+     * If a value is present, returns a result of the given predicate,
+     * otherwise returns a result of the given supplier.
+     *
+     * @param predicate the predicate for testing the value
+     * @param supplier  the supplying function that produces a value to be returned,
+     *                  if no value is present
+     * @return a result of {@code predicate}, if a value is present,
+     * otherwise a result of {@code supplier}
+     * @throws NullPointerException if {@code predicate}, {@code supplier} or its value
+     *                              are {@code null}
+     * @since 1.0
+     */
     public boolean orElseGet(Predicate<? super T> predicate, Supplier<Boolean> supplier) {
         requireNonNull(predicate);
         requireNonNull(supplier);
@@ -381,22 +470,30 @@ public class Conditional<T> {
         }
     }
 
-    public boolean orElseThrow(Predicate<? super T> predicate) {
-        requireNonNull(predicate);
-        if (isPresent()) {
-            return predicate.test(value);
-        } else {
-            throw new NoSuchElementException("No value");
-        }
-    }
-
-    public <X extends Throwable> boolean orElseThrow(Predicate<? super T> predicate, Supplier<? extends X> exceptionSupplier) throws X {
+    /**
+     * If a value is present, returns a result of the given predicate,
+     * otherwise throws an exception from the given supplier.
+     *
+     * @param predicate         the predicate for testing the value
+     * @param exceptionSupplier the supplying function that produces an exception to throw,
+     *                          if no value is present
+     * @return a result of {@code predicate}, if a value is present
+     * @throws NullPointerException if {@code predicate}, {@code exceptionSupplier} or its value
+     *                              are {@code null}
+     * @throws X                    if no value is present
+     * @since 1.0
+     */
+    public <X extends Throwable> boolean orElseThrow(
+            Predicate<? super T> predicate,
+            Supplier<? extends X> exceptionSupplier
+    ) throws X {
         requireNonNull(predicate);
         requireNonNull(exceptionSupplier);
         if (isPresent()) {
             return predicate.test(value);
         } else {
-            throw exceptionSupplier.get();
+            X exception = exceptionSupplier.get();
+            throw requireNonNull(exception);
         }
     }
 
@@ -411,9 +508,8 @@ public class Conditional<T> {
      *
      * @param obj an object to be tested for equality
      * @return {@code true} if the other object is "equal to" this object otherwise {@code false}
-     * @since 0.1.0
+     * @since 1.0
      */
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -430,7 +526,7 @@ public class Conditional<T> {
      * Returns the hash code of the value, if present, otherwise {@code 0} (zero) if no value is present.
      *
      * @return hash code value of the present value or {@code 0} if no value is present
-     * @since 0.1.0
+     * @since 1.0
      */
     @Override
     public int hashCode() {
@@ -441,7 +537,7 @@ public class Conditional<T> {
      * Returns a non-empty string representation of this {@code Conditional}.
      *
      * @return the string representation of this instance
-     * @since 0.1.0
+     * @since 1.0
      */
     @Override
     public String toString() {
@@ -449,4 +545,5 @@ public class Conditional<T> {
                 ? String.format("Conditional[%s]", value)
                 : "Conditional.empty";
     }
+
 }
